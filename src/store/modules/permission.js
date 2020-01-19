@@ -1,4 +1,4 @@
-import { asyncRoutes, constantRoutes } from '@/router'
+import { asyncRoutes, constantRoutes, componentMap } from '@/router'
 import { getRoutes } from '@/api/role'
 /**
  * Use meta.role to determine if the current user has permission
@@ -46,16 +46,12 @@ const mutations = {
   }
 }
 
-const componentMap = {
-  'layout': () => import('@/layout'),
-  'views-permission-page': () => import('@/views/permission/page'),
-  'test': () => import('@/views/test')
-}
+console.log(Array.from(componentMap.keys()))
 
-function autoImportRouteComponent(rts){
+function autoImportRouteComponent(rts) {
   rts.forEach(rt => {
-    rt.component = componentMap[rt.componentName]
-    if(Array.isArray(rt.children)){
+    rt.component = componentMap.get(rt.componentName)
+    if (Array.isArray(rt.children)) {
       rt.children = autoImportRouteComponent(rt.children)
     }
   })
@@ -69,11 +65,7 @@ const actions = {
         let routesFromServe = resp.data
         routesFromServe = autoImportRouteComponent(routesFromServe)
         let accessedRoutes
-        if (roles.includes('admin')) {
-          accessedRoutes = routesFromServe || []
-        } else {
-          accessedRoutes = filterAsyncRoutes(routesFromServe, roles)
-        }
+        accessedRoutes = filterAsyncRoutes(routesFromServe, roles)
         accessedRoutes = accessedRoutes.concat(asyncRoutes)
         console.log(accessedRoutes)
         commit('SET_ROUTES', accessedRoutes)

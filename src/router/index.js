@@ -12,6 +12,13 @@ import chartsRouter from './modules/charts'
 import tableRouter from './modules/table'
 import nestedRouter from './modules/nested'
 
+// 定义组件映射
+export const componentMap = new Map([
+  ['layout', () => import('@/layout')],
+  ['views-permission-page', () => import('@/views/permission/page')],
+  ['test', () => import('@/views/test')]
+])
+
 /**
  * Note: sub-menu only appear when route children.length >= 1
  * Detail see: https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
