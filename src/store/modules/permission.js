@@ -1,5 +1,8 @@
 import { asyncRoutes, constantRoutes, componentMap } from '@/router'
 import { getRoutes } from '@/api/role'
+import {
+  getRouterList
+} from '@/api/security'
 /**
  * Use meta.role to determine if the current user has permission
  * @param roles
@@ -50,6 +53,12 @@ console.log(Array.from(componentMap.keys()))
 
 function autoImportRouteComponent(rts) {
   rts.forEach(rt => {
+    if(rt.meta.icon.startsWith('svg:')){
+      rt.meta.icon = rt.meta.icon.substr(4)
+    }
+    if(rt.meta.icon.startsWith('el:')){
+      rt.meta.icon = rt.meta.icon.substr(3)
+    }
     rt.component = componentMap.get(rt.componentName)
     if (Array.isArray(rt.children)) {
       rt.children = autoImportRouteComponent(rt.children)
@@ -61,7 +70,7 @@ function autoImportRouteComponent(rts) {
 const actions = {
   generateRoutes({ commit }, roles) {
     return new Promise(resolve => {
-      getRoutes().then(resp => {
+      getRouterList().then(resp => {
         let routesFromServe = resp.data
         routesFromServe = autoImportRouteComponent(routesFromServe)
         let accessedRoutes

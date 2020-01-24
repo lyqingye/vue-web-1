@@ -16,7 +16,9 @@ import nestedRouter from './modules/nested'
 export const componentMap = new Map([
   ['layout', () => import('@/layout')],
   ['views-permission-page', () => import('@/views/permission/page')],
-  ['test', () => import('@/views/test')]
+  // ['test', () => import('@/views/test/index')],
+  // ['test', () => import('@/views/security/permission')]
+  ['test', () => import('@/views/security/route')]
 ])
 
 /**

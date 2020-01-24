@@ -20,7 +20,11 @@
                   <el-input v-model="form.name"></el-input>
                 </el-form-item>
                 <el-form-item label="组件名称">
-                  <el-input v-model="form.name"></el-input>
+                  <el-select v-model="value" placeholder="请选择父节点">
+                    <el-option v-for="item in form.components" :key="item.value" :label="item.label" :value="item.value">
+                    </el-option>
+                  </el-select>
+
                 </el-form-item>
                 <el-form-item label="路由地址">
                   <el-input v-model="form.name"></el-input>
@@ -102,6 +106,7 @@
 
 <script>
   import iconPicker from '@/components/IconPicker'
+  import { componentMap } from '@/router'
   export default {
     components: {
       iconPicker
@@ -109,6 +114,7 @@
     data() {
       return {
         dialogTableVisible: false,
+        value: null,
         form: {
           icon: '',
           name: '',
@@ -126,6 +132,12 @@
             value: '选项2',
             label: '双皮奶'
           }],
+          components: Array.from(componentMap.keys()).map(v => {
+            return {
+              label: v,
+              value: v
+            }
+          })
         }
       }
     },

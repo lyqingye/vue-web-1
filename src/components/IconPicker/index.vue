@@ -3,7 +3,7 @@
     <el-tabs type="border-card">
       <el-tab-pane label="Icons">
         <div class="grid">
-          <div v-for="item of svgIcons" :key="item" @click="$emit('picked-icon', item)">
+          <div v-for="item of svgIcons" :key="item" @click="$emit('picked-icon', 'svg:' + item)">
             <el-tooltip placement="top">
               <div slot="content">
                 {{ item }}
@@ -18,7 +18,7 @@
       </el-tab-pane>
       <el-tab-pane label="Element-UI Icons">
         <div class="grid">
-          <div v-for="item of elementIcons" :key="item" @click="$emit('picked-icon', item)">
+          <div v-for="item of elementIcons" :key="item" @click="$emit('picked-icon', 'el:' + item)">
             <el-tooltip placement="top">
               <div slot="content">
                 {{ item }}
