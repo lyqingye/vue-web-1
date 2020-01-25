@@ -53,10 +53,10 @@ console.log(Array.from(componentMap.keys()))
 
 function autoImportRouteComponent(rts) {
   rts.forEach(rt => {
-    if(rt.meta.icon.startsWith('svg:')){
+    if (rt.meta.icon !== null && rt.meta.icon.startsWith('svg:')) {
       rt.meta.icon = rt.meta.icon.substr(4)
     }
-    if(rt.meta.icon.startsWith('el:')){
+    if (rt.meta.icon !== null && rt.meta.icon.startsWith('el:')) {
       rt.meta.icon = rt.meta.icon.substr(3)
     }
     rt.component = componentMap.get(rt.componentName)

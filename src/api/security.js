@@ -2,7 +2,7 @@ import request from '@/utils/request'
 export function getPermissionList() {
   return request({
     url: '/api/admin/security/permissionList',
-    method: 'get',
+    method: 'get'
   })
 }
 
@@ -39,13 +39,36 @@ export function deletePermission(id) {
 export function getRouterList() {
   return request({
     url: '/api/admin/security/routerList',
-    method: 'get',
+    method: 'get'
   })
 }
 
 export function getMenuRouterList() {
   return request({
     url: '/api/admin/security/menuRouterList',
-    method: 'get',
+    method: 'get'
+  })
+}
+
+export function addMenuRouter(data) {
+  return request({
+    url: '/api/admin/security/addMenuRouter',
+    method: 'post',
+    data
+  })
+}
+
+export function updateMenuRouter(data) {
+  return request({
+    url: '/api/admin/security/updateMenuRouter',
+    method: 'put',
+    data
+  })
+}
+
+export function deleteMenuRouter(routerId) {
+  return request({
+    url: '/api/admin/security/deleteMenuRouter/' + routerId,
+    method: 'delete'
   })
 }

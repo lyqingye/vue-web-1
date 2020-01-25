@@ -41,13 +41,13 @@ import svgIcons from './svg-icons'
 import elementIcons from './element-icons'
 
 export default {
-  name: 'iconPicker',
+  name: 'IconPicker',
   data() {
     return {
       svgIcons,
       elementIcons
     }
-  },
+  }
 }
 </script>
 
