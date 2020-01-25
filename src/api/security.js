@@ -1,4 +1,10 @@
 import request from '@/utils/request'
+
+
+//----------------------------------------------------------
+// permission
+//----------------------------------------------------------
+
 export function getPermissionList() {
   return request({
     url: '/api/admin/security/permissionList',
@@ -36,6 +42,10 @@ export function deletePermission(id) {
   })
 }
 
+//----------------------------------------------------------
+// router
+//----------------------------------------------------------
+
 export function getRouterList() {
   return request({
     url: '/api/admin/security/routerList',
@@ -69,6 +79,41 @@ export function updateMenuRouter(data) {
 export function deleteMenuRouter(routerId) {
   return request({
     url: '/api/admin/security/deleteMenuRouter/' + routerId,
+    method: 'delete'
+  })
+}
+
+//----------------------------------------------------------
+// role
+//----------------------------------------------------------
+
+export function getRolePageInfo(pagerRequest) {
+  return request({
+    url: '/api/admin/security/rolePageInfo',
+    method: 'post',
+    data: pagerRequest
+  })
+}
+
+export function addRole(data) {
+  return request({
+    url: '/api/admin/security/addRole',
+    method: 'post',
+    data
+  })
+}
+
+export function updateRole(data) {
+  return request({
+    url: '/api/admin/security/updateRole',
+    method: 'put',
+    data
+  })
+}
+
+export function deleteRole(roleId) {
+  return request({
+    url: '/api/admin/security/deleteRole/' + roleId,
     method: 'delete'
   })
 }

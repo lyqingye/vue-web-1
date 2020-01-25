@@ -56,10 +56,10 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="操作" fixed="right" min-width="190">
+          <el-table-column label="操作" fixed="right" min-width="190" >
             <template slot-scope="scope">
               <el-button icon="el-icon-edit" size="mini" type="primary" @click="handleUpdateMenuRouter(scope.$index, scope.row)">编辑</el-button>
-              <el-button slot="reference" icon="el-icon-delete" size="mini" type="danger"  @click="handeleteRouterDelete(scope.$index, scope.row)">删除</el-button>
+              <el-button slot="reference" icon="el-icon-delete" size="mini" type="danger" @click="handeleteRouterDelete(scope.$index, scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -433,6 +433,7 @@ export default {
     onSelectedIcon: function(icon) {
       console.log(icon)
       this.addRouteDialog.formData.icon = icon
+      this.updateRouteDialog.formData.icon = icon
       this.isIconPickerDialogShow = false
     },
 
@@ -505,20 +506,19 @@ export default {
       })
     },
 
-
     // helper functions
     buildPermissionStatusList: function(permissionTree, checkedKeys) {
       console.log(checkedKeys)
       const permissionStatusList = this.flatPermissionTreeToArray(permissionTree)
       if (permissionStatusList !== null) {
         permissionStatusList.forEach(status => {
-          if(checkedKeys !== null && checkedKeys.length !== 0){
+          if (Array.isArray(checkedKeys) && checkedKeys.length) {
             if (checkedKeys.includes(status.permissionId)) {
               status.isEnable = true
             } else {
               status.isEnable = false
             }
-          }else{
+          } else {
             status.isEnable = false
           }
         })

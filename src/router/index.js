@@ -15,10 +15,9 @@ import nestedRouter from './modules/nested'
 // 定义组件映射
 export const componentMap = new Map([
   ['layout', () => import('@/layout')],
-  ['views-permission-page', () => import('@/views/permission/page')],
-  // ['test', () => import('@/views/test/index')],
-  // ['test', () => import('@/views/security/permission')]
-  ['test', () => import('@/views/security/route')]
+  ['security-permission', () => import('@/views/security/permission')],
+  ['security-router', () => import('@/views/security/route')],
+  ['security-role', () => import('@/views/security/role')]
 ])
 
 /**
