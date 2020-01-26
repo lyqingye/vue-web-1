@@ -69,6 +69,24 @@
         </el-form-item>
 
       </el-form>
+
+      <el-collapse>
+        <el-collapse-item>
+          <template slot="title">
+            <i class="header-icon el-icon-circle-plus" />&nbsp;&nbsp;赋予角色权限
+          </template>
+          <el-tree
+            ref="addRoleTree"
+            :data="permissionTree"
+            show-checkbox
+            default-expand-all
+            node-key="id"
+            highlight-current
+            :props="permissionTreeDefaultProps"
+          />
+        </el-collapse-item>
+      </el-collapse>
+
       <div slot="footer" class="dialog-footer">
         <el-button @click="addRoleDialog.isShow = false">取 消</el-button>
         <el-button type="primary" @click="handleAddRole">确 定</el-button>
@@ -77,16 +95,37 @@
 
     <!--更新角色对话框-->
     <el-dialog title="更新角色" modal :visible.sync="updateRoleDialog.isShow" width="25%">
-      <el-form label-position="left">
-        <el-form-item label="角色名称">
-          <el-input v-model="updateRoleDialog.formData.roleName" />
-        </el-form-item>
-
-        <el-form-item label="备注">
-          <el-input v-model="updateRoleDialog.formData.remark" type="textarea" />
-        </el-form-item>
-
-      </el-form>
+      <div v-loading="updateRoleDialog.updateLoading">
+        <el-form label-position="left">
+          <el-form-item label="角色名称">
+            <el-input v-model="updateRoleDialog.formData.roleName" />
+          </el-form-item>
+        
+          <el-form-item label="备注">
+            <el-input v-model="updateRoleDialog.formData.remark" type="textarea" />
+          </el-form-item>
+        
+        </el-form>
+        
+        <el-collapse>
+          <el-collapse-item>
+            <template slot="title">
+              <i class="header-icon el-icon-circle-plus" />&nbsp;&nbsp;赋予角色权限
+            </template>
+            <el-tree
+              ref="updateRoleTree"
+              :data="permissionTree"
+              show-checkbox
+              default-expand-all
+              node-key="id"
+              highlight-current
+              :props="permissionTreeDefaultProps"
+              :default-checked-keys="updateRoleDialog.defaultCheckedPermissionIdList"
+            />
+          </el-collapse-item>
+        </el-collapse>
+      </div>
+    
       <div slot="footer" class="dialog-footer">
         <el-button @click="updateRoleDialog.isShow = false">取 消</el-button>
         <el-button type="primary" @click="doUpdateRole">确 定</el-button>
@@ -100,12 +139,19 @@ import {
   getRolePageInfo,
   addRole,
   updateRole,
-  deleteRole
+  deleteRole,
+  getPermissionList
 } from '@/api/security'
 export default {
 
   data() {
     return {
+      permissionTree: [],
+      permissionTreeDefaultProps: {
+        children: 'children',
+        label: 'permissionName',
+        checked: 'isEnable'
+      },
       table: {
         data: [],
         loading: false,
@@ -120,24 +166,29 @@ export default {
         isShow: false,
         formData: {
           roleName: null,
-          remark: null
+          remark: null,
+          permissionStatusList: []
         }
       },
 
       updateRoleDialog: {
+        defaultCheckedPermissionIdList: [],
         isShow: false,
+        updateLoading: false,
         formData: {
           id: null,
           roleName: null,
           remark: null,
           createTime: null,
-          creatorName: null
+          creatorName: null,
+          permissionStatusList: []
         }
       }
     }
   },
   created() {
     this.loadRolePageInfo()
+    this.loadPermissionList()
   },
   methods: {
     loadRolePageInfo: function() {
@@ -151,6 +202,71 @@ export default {
       })
     },
 
+    loadPermissionList: function() {
+      this.table.loading = true
+      getPermissionList().then(resp => {
+        this.permissionTree = resp.data
+        // this.permissionTree = this.recursionMapPermissionList(resp.data)
+        // todo 测试树形结构数据拉平为一维数组，然后将权限树形结构拉平，然后post到添加路由
+        console.log(this.buildPermissionStatusList(this.permissionTree))
+        this.table.loading = false
+      })
+    },
+
+    /**
+       * 递归将权限列表转换为 tree:
+       * {
+       *    id: null,
+       *    label: null,
+       *    children: []
+       * }
+       * @param {Object} permissionList
+       */
+    recursionMapPermissionList: function(permissionList) {
+      const result = []
+      if (permissionList !== null && permissionList.length !== 0) {
+        permissionList.forEach(node => {
+          const treeNode = {
+            id: node.id,
+            label: node.permissionName,
+            children: null,
+            checked: false
+          }
+          treeNode.children = this.recursionMapPermissionList(node.children)
+          result.push(treeNode)
+        })
+      }
+      return result
+    },
+
+    /**
+       * 根据所给的权限ID列表，过滤所给的 权限树
+       * @param {Object} permissionTree 权限树
+       * @param {Object} selectedPermissionIdList 权限ID列表
+       */
+    recursionFilterPermissionTree: function(permissionTree, selectedPermissionIdList) {
+      const result = []
+      if (permissionTree !== null && permissionTree.length !== 0) {
+        permissionTree.forEach(node => {
+          const newNode = {
+            id: node.id,
+            label: node.label,
+            children: null,
+            checked: false
+          }
+
+          if (selectedPermissionIdList.length !== 0) {
+            if (selectedPermissionIdList.includes(node.id)) {
+              newNode.checked = true
+            }
+          }
+          newNode.children = this.recursionFilterPermissionTree(node.children, selectedPermissionIdList)
+          result.push(newNode)
+        })
+      }
+      return result
+    },
+
     handleTablePageChange: function(currentPage) {
       this.table.pagerRequest.pageNumber = currentPage
       this.loadRolePageInfo()
@@ -162,6 +278,7 @@ export default {
     },
 
     handleAddRole: function() {
+      this.addRoleDialog.formData.permissionStatusList = this.buildPermissionStatusList(this.permissionTree, this.$refs.addRoleTree.getCheckedKeys())
       addRole(this.addRoleDialog.formData).then(resp => {
         if (resp.status === 0) {
           this.$message({
@@ -204,11 +321,22 @@ export default {
     },
 
     handleUpdateRole: function(index, data) {
+      console.log(data)
       this.updateRoleDialog.formData = data
       this.updateRoleDialog.isShow = true
+      // 坑！如果没有显示过更新窗口，那么 tree 不会被创建, 如果 tree 创建了
+      // 那么 default-checked-keys 是不会双向数据绑定的，也就是说它就是个初始值
+      // 解决方案：判断 tree 是否创建，如果没有创建者设置初始值，否则调用 setCheckedKeys 设置选中的 key
+      if ('updateRoleTree' in this.$refs) {
+        this.$refs.updateRoleTree.setCheckedKeys(data.permissionIdSet, false)
+      } else {
+        this.updateRoleDialog.defaultCheckedPermissionIdList = data.permissionIdSet
+      }
     },
 
     doUpdateRole: function() {
+      this.updateRoleDialog.updateLoading = true
+      this.updateRoleDialog.formData.permissionStatusList = this.buildPermissionStatusList(this.permissionTree, this.$refs.updateRoleTree.getCheckedKeys())
       updateRole(this.updateRoleDialog.formData).then(resp => {
         if (resp.status === 0) {
           this.$message({
@@ -222,8 +350,41 @@ export default {
             type: 'error'
           })
         }
+        this.updateRoleDialog.updateLoading = false
         this.updateRoleDialog.isShow = false
       })
+    },
+
+    // helper functions
+    buildPermissionStatusList: function(permissionTree, checkedKeys) {
+      console.log(checkedKeys)
+      const permissionStatusList = this.flatPermissionTreeToArray(permissionTree)
+      if (permissionStatusList !== null) {
+        permissionStatusList.forEach(status => {
+          if (Array.isArray(checkedKeys) && checkedKeys.length) {
+            if (checkedKeys.includes(status.permissionId)) {
+              status.isEnable = true
+            } else {
+              status.isEnable = false
+            }
+          } else {
+            status.isEnable = false
+          }
+        })
+        return permissionStatusList
+      }
+      return []
+    },
+
+    flatPermissionTreeToArray: function(permissionTree) {
+      let result = []
+      if (permissionTree !== null) {
+        result = [].concat(...permissionTree.map(item => [].concat({
+          permissionId: item.id,
+          isEnable: item.isEnable
+        }, ...this.flatPermissionTreeToArray(item.children))))
+      }
+      return result
     }
   }
 }

@@ -117,3 +117,46 @@ export function deleteRole(roleId) {
     method: 'delete'
   })
 }
+
+export function getRoleList() {
+  return request({
+    url: '/api/admin/security/roleList',
+    method: 'get'
+  })
+}
+
+
+//----------------------------------------------------------
+// user
+//----------------------------------------------------------
+
+export function getUserPageInfo(pagerRequest) {
+  return request({
+    url: '/api/admin/security/userPageInfo',
+    method: 'post',
+    data: pagerRequest
+  })
+}
+
+export function addUser(data) {
+  return request({
+    url: '/api/admin/security/addUser',
+    method: 'post',
+    data
+  })
+}
+
+export function updateUser(data) {
+  return request({
+    url: '/api/admin/security/updateUser',
+    method: 'put',
+    data
+  })
+}
+
+export function deleteUser(userId) {
+  return request({
+    url: '/api/admin/security/deleteUser/' + userId,
+    method: 'delete'
+  })
+}

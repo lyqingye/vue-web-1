@@ -17,7 +17,8 @@ export const componentMap = new Map([
   ['layout', () => import('@/layout')],
   ['security-permission', () => import('@/views/security/permission')],
   ['security-router', () => import('@/views/security/route')],
-  ['security-role', () => import('@/views/security/role')]
+  ['security-role', () => import('@/views/security/role')],
+  ['security-user', () => import('@/views/security/user')]
 ])
 
 /**

@@ -56,7 +56,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="操作" fixed="right" min-width="190" >
+          <el-table-column label="操作" fixed="right" min-width="190">
             <template slot-scope="scope">
               <el-button icon="el-icon-edit" size="mini" type="primary" @click="handleUpdateMenuRouter(scope.$index, scope.row)">编辑</el-button>
               <el-button slot="reference" icon="el-icon-delete" size="mini" type="danger" @click="handeleteRouterDelete(scope.$index, scope.row)">删除</el-button>
@@ -134,7 +134,7 @@
 
       </el-form>
 
-      <el-collapse accordion>
+      <el-collapse>
         <el-collapse-item>
           <template slot="title">
             <i class="header-icon el-icon-circle-plus" />&nbsp;&nbsp;控制菜单所需要的权限
@@ -160,87 +160,89 @@
 
     <!--更新菜单对话框-->
     <el-dialog title="更新菜单路由" :visible.sync="updateRouteDialog.isShow" width="25%">
-      <el-form label-position="right" label-width="120px">
+      <div v-loading="updateRouteDialog.updateLoading">
+        <el-form label-position="right" label-width="120px">
 
-        <el-form-item label="父节点">
-          <el-select v-model="updateRouteDialog.formData.parentId" placeholder="请选择父节点">
-            <el-option v-for="item in parentOptions" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
-        </el-form-item>
+          <el-form-item label="父节点">
+            <el-select v-model="updateRouteDialog.formData.parentId" placeholder="请选择父节点">
+              <el-option v-for="item in parentOptions" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+          </el-form-item>
 
-        <el-form-item label="菜单标题">
-          <el-input v-model="updateRouteDialog.formData.title" />
-        </el-form-item>
+          <el-form-item label="菜单标题">
+            <el-input v-model="updateRouteDialog.formData.title" />
+          </el-form-item>
 
-        <el-form-item label="路由地址">
-          <el-input v-model="updateRouteDialog.formData.routerPath" />
-        </el-form-item>
+          <el-form-item label="路由地址">
+            <el-input v-model="updateRouteDialog.formData.routerPath" />
+          </el-form-item>
 
-        <el-form-item label="重定向地址">
-          <el-input v-model="updateRouteDialog.formData.redirect" />
-        </el-form-item>
+          <el-form-item label="重定向地址">
+            <el-input v-model="updateRouteDialog.formData.redirect" />
+          </el-form-item>
 
-        <el-form-item label="组件名">
-          <el-select v-model="updateRouteDialog.formData.componentName" placeholder="请选择父节点">
-            <el-option v-for="item in componentOptions" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
-        </el-form-item>
+          <el-form-item label="组件名">
+            <el-select v-model="updateRouteDialog.formData.componentName" placeholder="请选择父节点">
+              <el-option v-for="item in componentOptions" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+          </el-form-item>
 
-        <el-form-item label="菜单图标">
-          <el-form :inline="true">
-            <el-form-item>
-              <el-input v-model="updateRouteDialog.formData.icon" />
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" icon="el-icon-plus" size="medium" @click="isIconPickerDialogShow = true" />
-            </el-form-item>
-          </el-form>
-        </el-form-item>
+          <el-form-item label="菜单图标">
+            <el-form :inline="true">
+              <el-form-item>
+                <el-input v-model="updateRouteDialog.formData.icon" />
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" icon="el-icon-plus" size="medium" @click="isIconPickerDialogShow = true" />
+              </el-form-item>
+            </el-form>
+          </el-form-item>
 
-        <el-form-item label="菜单权重">
-          <el-input v-model="updateRouteDialog.formData.weight" />
-        </el-form-item>
+          <el-form-item label="菜单权重">
+            <el-input v-model="updateRouteDialog.formData.weight" />
+          </el-form-item>
 
-        <el-form-item label="在侧边栏隐藏">
-          <el-switch v-model="updateRouteDialog.formData.isHidden" />
-        </el-form-item>
+          <el-form-item label="在侧边栏隐藏">
+            <el-switch v-model="updateRouteDialog.formData.isHidden" />
+          </el-form-item>
 
-        <el-form-item label="在TagView显示">
-          <el-switch v-model="updateRouteDialog.formData.isShowTagView" />
-        </el-form-item>
+          <el-form-item label="在TagView显示">
+            <el-switch v-model="updateRouteDialog.formData.isShowTagView" />
+          </el-form-item>
 
-        <el-form-item label="在面包屑显示">
-          <el-switch v-model="updateRouteDialog.formData.isShowBreadcrumb" />
-        </el-form-item>
+          <el-form-item label="在面包屑显示">
+            <el-switch v-model="updateRouteDialog.formData.isShowBreadcrumb" />
+          </el-form-item>
 
-        <el-form-item label="不缓存页面">
-          <el-switch v-model="updateRouteDialog.formData.noCache" />
-        </el-form-item>
+          <el-form-item label="不缓存页面">
+            <el-switch v-model="updateRouteDialog.formData.noCache" />
+          </el-form-item>
 
-        <el-form-item label="激活菜单">
-          <el-switch v-model="updateRouteDialog.formData.isActive" />
-        </el-form-item>
+          <el-form-item label="激活菜单">
+            <el-switch v-model="updateRouteDialog.formData.isActive" />
+          </el-form-item>
 
-      </el-form>
+        </el-form>
 
-      <el-collapse accordion>
-        <el-collapse-item>
-          <template slot="title">
-            <i class="header-icon el-icon-circle-plus" />&nbsp;&nbsp;控制菜单所需要的权限
-          </template>
-          <el-tree
-            ref="updatePermissionTree"
-            :data="permissionTree"
-            show-checkbox
-            default-expand-all
-            node-key="id"
-            highlight-current
-            :default-checked-keys="updateRouteDialog.defaultCheckedPermissionIdList"
-            :props="permissionTreeDefaultProps"
-          />
-        </el-collapse-item>
+        <el-collapse>
+          <el-collapse-item>
+            <template slot="title">
+              <i class="header-icon el-icon-circle-plus" />&nbsp;&nbsp;控制菜单所需要的权限
+            </template>
+            <el-tree
+              ref="updatePermissionTree"
+              :data="permissionTree"
+              show-checkbox
+              default-expand-all
+              node-key="id"
+              highlight-current
+              :default-checked-keys="updateRouteDialog.defaultCheckedPermissionIdList"
+              :props="permissionTreeDefaultProps"
+            />
+          </el-collapse-item>
 
-      </el-collapse>
+        </el-collapse>
+      </div>
 
       <div slot="footer" class="dialog-footer">
         <el-button @click="updateRouteDialog.isShow = false">取 消</el-button>
@@ -320,6 +322,7 @@ export default {
       },
       updateRouteDialog: {
         isShow: false,
+        updateLoading: false,
         defaultCheckedPermissionIdList: [],
         formData: {
           parentId: null,
@@ -461,9 +464,16 @@ export default {
       this.updateRouteDialog.isShow = true
       this.updateRouteDialog.formData = data
       this.updateRouteDialog.defaultCheckedPermissionIdList = data.permissionIdSet
+
+      if ('updatePermissionTree' in this.$refs) {
+        this.$refs.updatePermissionTree.setCheckedKeys(data.permissionIdSet, false)
+      } else {
+        this.updateRouteDialog.defaultCheckedPermissionIdList = data.permissionIdSet
+      }
     },
 
     doUpdateRouter: function() {
+      this.updateRouteDialog.updateLoading = true
       this.updateRouteDialog.formData.permissionStatusList = this.buildPermissionStatusList(this.permissionTree, this.$refs.updatePermissionTree.getCheckedKeys())
       updateMenuRouter(this.updateRouteDialog.formData).then(resp => {
         if (resp.status === 0) {
@@ -478,6 +488,7 @@ export default {
             type: 'error'
           })
         }
+        this.updateRouteDialog.updateLoading = false
         this.updateRouteDialog.isShow = false
       })
     },
