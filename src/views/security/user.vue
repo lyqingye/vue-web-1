@@ -3,7 +3,7 @@
     <el-container>
       <!-- 顶部栏 用于放置其它控件-->
       <el-header ref="header" style="height: 20px;">
-        <el-button type="success" icon="el-icon-plus" size="mini" style="float: right;" @click="addUserDialog.isShow = true">新增</el-button>
+        <el-button type="success" icon="el-icon-plus" size="mini" style="float: right;" @click="addUserDialog.isShow = true" v-permission="['user:add']" >新增</el-button>
       </el-header>
 
       <!-- 数据表格 -->
@@ -182,8 +182,9 @@ import {
   deleteUser,
   getRoleList
 } from '@/api/security'
+import permission from '@/directive/permission/index.js'
 export default {
-
+  directives: { permission },
   data() {
     return {
       roleTree: [],

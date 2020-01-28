@@ -3,7 +3,7 @@
     <el-container>
       <!-- 顶部栏 用于放置其它控件-->
       <el-header ref="header" style="height: 20px;">
-        <el-button type="success" icon="el-icon-plus" size="mini" style="float: right;" @click="addPermissionDialog.isShow = true">新增</el-button>
+        <el-button v-permission="['permission:add']" type="success" icon="el-icon-plus" size="mini" style="float: right;" @click="addPermissionDialog.isShow = true">新增</el-button>
       </el-header>
 
       <!-- 数据表格 -->
@@ -114,8 +114,9 @@ import {
   deletePermission,
   updatePermissionIsEnable
 } from '@/api/security'
+import permission from '@/directive/permission/index.js'
 export default {
-
+  directives: { permission },
   data() {
     return {
       table: {

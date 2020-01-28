@@ -9,9 +9,12 @@ import {
  * @param route
  */
 function hasPermission(roles, route) {
-  if (route.meta && route.meta.roles) {
-    return roles.some(role => route.meta.roles.includes(role))
+  if (route.meta && route.meta.roles && route.meta.roles.length) {
+    return route.meta.roles.every(routerRole => roles.includes(routerRole))
+    //return roles.some(role => route.meta.roles.includes(role))
+
   } else {
+    // 没有指定路由所需要的权限时,直接放行
     return true
   }
 }

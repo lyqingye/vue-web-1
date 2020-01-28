@@ -125,7 +125,6 @@ export function getRoleList() {
   })
 }
 
-
 //----------------------------------------------------------
 // user
 //----------------------------------------------------------
@@ -158,5 +157,12 @@ export function deleteUser(userId) {
   return request({
     url: '/api/admin/security/deleteUser/' + userId,
     method: 'delete'
+  })
+}
+
+export function getUserInfo() {
+  return request({
+    url: '/api/admin/security/getLoginUserInfo',
+    method: 'get'
   })
 }

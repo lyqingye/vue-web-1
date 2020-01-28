@@ -3,7 +3,7 @@
     <el-container>
       <!-- 顶部栏 用于放置其它控件-->
       <el-header ref="header" style="height: 20px;">
-        <el-button type="success" icon="el-icon-plus" size="mini" style="float: right;" @click="addRoleDialog.isShow = true">新增</el-button>
+        <el-button v-permission="['role:add']" type="success" icon="el-icon-plus" size="mini" style="float: right;" @click="addRoleDialog.isShow = true">新增</el-button>
       </el-header>
 
       <!-- 数据表格 -->
@@ -15,7 +15,7 @@
 
           <el-table-column prop="remark" label="角色备注" width="250" />
 
-          <el-table-column label="创建者" width="100" align="center">
+          <el-table-column label="创建者"  align="center">
             <template slot-scope="scope">
               <el-tag
                 type="success"
@@ -36,7 +36,7 @@
           <el-table-column label="操作" fixed="right" min-width="190">
             <template slot-scope="scope">
               <el-button icon="el-icon-edit" size="mini" type="primary" @click="handleUpdateRole(scope.$index, scope.row)">编辑</el-button>
-              <el-button slot="reference" icon="el-icon-delete" size="mini" type="danger" @click="handleDeleteRole(scope.$index, scope.row)">删除</el-button>
+              <el-button v-permission="['role:delete']" slot="reference" icon="el-icon-delete" size="mini" type="danger" @click="handleDeleteRole(scope.$index, scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -89,7 +89,7 @@
 
       <div slot="footer" class="dialog-footer">
         <el-button @click="addRoleDialog.isShow = false">取 消</el-button>
-        <el-button type="primary" @click="handleAddRole">确 定</el-button>
+        <el-button v-permission="['role:add']" type="primary" @click="handleAddRole">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -100,13 +100,13 @@
           <el-form-item label="角色名称">
             <el-input v-model="updateRoleDialog.formData.roleName" />
           </el-form-item>
-        
+
           <el-form-item label="备注">
             <el-input v-model="updateRoleDialog.formData.remark" type="textarea" />
           </el-form-item>
-        
+
         </el-form>
-        
+
         <el-collapse>
           <el-collapse-item>
             <template slot="title">
@@ -125,10 +125,10 @@
           </el-collapse-item>
         </el-collapse>
       </div>
-    
+
       <div slot="footer" class="dialog-footer">
         <el-button @click="updateRoleDialog.isShow = false">取 消</el-button>
-        <el-button type="primary" @click="doUpdateRole">确 定</el-button>
+        <el-button v-permission="['role:update']" type="primary" @click="doUpdateRole">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -142,14 +142,15 @@ import {
   deleteRole,
   getPermissionList
 } from '@/api/security'
+import permission from '@/directive/permission/index.js'
 export default {
-
+  directives: { permission },
   data() {
     return {
       permissionTree: [],
       permissionTreeDefaultProps: {
         children: 'children',
-        label: 'permissionName',
+        label: 'remark',
         checked: 'isEnable'
       },
       table: {

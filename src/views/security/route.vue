@@ -293,7 +293,7 @@ export default {
       permissionTree: [],
       permissionTreeDefaultProps: {
         children: 'children',
-        label: 'permissionName',
+        label: 'remark',
         checked: 'isEnable'
       },
 

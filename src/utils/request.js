@@ -1,8 +1,16 @@
 import axios from 'axios'
-import { MessageBox, Message } from 'element-ui'
+import {
+  MessageBox,
+  Message
+} from 'element-ui'
 import store from '@/store'
-import { getToken } from '@/utils/auth'
+import {
+  getToken
+} from '@/utils/auth'
 import router from '@/router'
+import {
+  Notification
+} from 'element-ui';
 // create an axios instance
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
@@ -35,7 +43,7 @@ service.interceptors.response.use(
   /**
    * If you want to get http information such as headers or status
    * Please return  response => response
-  */
+   */
 
   /**
    * Determine the request status by custom code
@@ -47,38 +55,49 @@ service.interceptors.response.use(
     // if the custom code is not 20000, it is judged as an error.
 
     if (response.status !== 200 || res.status !== 0) {
-      Message({
-        message: res.message || 'Error',
-        type: 'error',
-        duration: 5 * 1000
-      })
+      Notification({
+        title: '系统异常',
+        message: res.message,
+        type: 'error'
+      });
+
       return Promise.reject(new Error(res.message || 'Error'))
     } else {
       return res
     }
   },
   error => {
+    const notify = Notification
     switch (error.response.status) {
       case 403:
+        notify({
+          title: '警告',
+          message: '你没有权限访问',
+          type: 'warning'
+        });
         router.push('/error/401')
         break;
       case 404:
         router.push('/error/404')
         break;
       case 401:
+        notify({
+          title: '警告',
+          message: '你还没登录,请重新登录',
+          type: 'warning'
+        });
         store.dispatch('user/resetToken').then(() => {
           location.reload()
         })
         break;
       default:
-
+        notify({
+          title: '错误(debug)',
+          message: error,
+          type: 'error'
+        });
     }
-    console.log('err' + error) // for debug
-    // Message({
-    //   message: error.message,
-    //   type: 'error',
-    //   duration: 5 * 1000
-    // })
+
     return Promise.reject(error)
   }
 )
