@@ -78,7 +78,7 @@ const actions = {
         routesFromServe = autoImportRouteComponent(routesFromServe)
         let accessedRoutes
         accessedRoutes = filterAsyncRoutes(routesFromServe, roles)
-        accessedRoutes = accessedRoutes.concat(asyncRoutes)
+        //accessedRoutes = accessedRoutes.concat(asyncRoutes)
         console.log(accessedRoutes)
         commit('SET_ROUTES', accessedRoutes)
         resolve(accessedRoutes)

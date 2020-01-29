@@ -15,7 +15,7 @@
 
           <el-table-column prop="remark" label="角色备注" width="250" />
 
-          <el-table-column label="创建者"  align="center">
+          <el-table-column label="创建者" width="150" align="center">
             <template slot-scope="scope">
               <el-tag
                 type="success"

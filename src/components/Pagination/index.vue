@@ -15,14 +15,14 @@
 </template>
 
 <script>
-import { scrollTo } from '@/utils/scroll-to'
 
 export default {
   name: 'Pagination',
   props: {
     total: {
       required: true,
-      type: Number
+      type: Number,
+      default: 0
     },
     page: {
       type: Number,
@@ -30,12 +30,12 @@ export default {
     },
     limit: {
       type: Number,
-      default: 20
+      default: 10
     },
     pageSizes: {
       type: Array,
       default() {
-        return [10, 20, 30, 50]
+        return [10, 20, 30]
       }
     },
     layout: {
@@ -46,10 +46,7 @@ export default {
       type: Boolean,
       default: true
     },
-    autoScroll: {
-      type: Boolean,
-      default: true
-    },
+
     hidden: {
       type: Boolean,
       default: false
@@ -73,18 +70,15 @@ export default {
       }
     }
   },
+  created() {
+    this.$emit('pagination', { pageNumber: this.currentPage, pageSize: this.limit })
+  },
   methods: {
     handleSizeChange(val) {
-      this.$emit('pagination', { page: this.currentPage, limit: val })
-      if (this.autoScroll) {
-        scrollTo(0, 800)
-      }
+      this.$emit('pagination', { pageNumber: this.currentPage, pageSize: val })
     },
     handleCurrentChange(val) {
-      this.$emit('pagination', { page: val, limit: this.pageSize })
-      if (this.autoScroll) {
-        scrollTo(0, 800)
-      }
+      this.$emit('pagination', { pageNumber: val, pageSize: this.pageSize })
     }
   }
 }
@@ -93,9 +87,6 @@ export default {
 <style scoped>
 .pagination-container {
   background: #fff;
-  padding: 32px 16px;
 }
-.pagination-container.hidden {
-  display: none;
-}
+
 </style>
