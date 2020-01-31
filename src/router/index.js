@@ -20,7 +20,8 @@ export const componentMap = new Map([
   ['security-role', () => import('@/views/security/role')],
   ['security-user', () => import('@/views/security/user')],
   ['logs-method-log', () => import('@/views/logs/methodLog')],
-  ['logs-exception-log', () => import('@/views/logs/exceptionLog')]
+  ['logs-exception-log', () => import('@/views/logs/exceptionLog')],
+  ['logs-sms-log', () => import('@/views/logs/smsLog')]
 ])
 
 /**
