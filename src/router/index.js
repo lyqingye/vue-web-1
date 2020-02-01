@@ -21,7 +21,9 @@ export const componentMap = new Map([
   ['security-user', () => import('@/views/security/user')],
   ['logs-method-log', () => import('@/views/logs/methodLog')],
   ['logs-exception-log', () => import('@/views/logs/exceptionLog')],
-  ['logs-sms-log', () => import('@/views/logs/smsLog')]
+  ['logs-sms-log', () => import('@/views/logs/smsLog')],
+  ['global-dict-type', () => import('@/views/config/dictType')],
+  ['global-params-type', () => import('@/views/config/globalParamsType')]
 ])
 
 /**
