@@ -23,7 +23,8 @@ export const componentMap = new Map([
   ['logs-exception-log', () => import('@/views/logs/exceptionLog')],
   ['logs-sms-log', () => import('@/views/logs/smsLog')],
   ['global-dict-type', () => import('@/views/config/dictType')],
-  ['global-params-type', () => import('@/views/config/globalParamsType')]
+  ['global-params-type', () => import('@/views/config/globalParamsType')],
+  ['global-dict', () => import('@/views/config/dict')]
 ])
 
 /**

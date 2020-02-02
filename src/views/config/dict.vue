@@ -12,7 +12,14 @@
           </el-form-item>
 
           <el-form-item label="类型名称">
-            <el-input v-model="table.pageQuery.data.typeName" placeholder="可选" />
+            <el-select v-model="table.pageQuery.data.typeId" placeholder="请选择">
+                <el-option
+                  v-for="item in dictTypeList"
+                  :key="item.typeId"
+                  :label="item.typeName"
+                  :value="item.typeId">
+                </el-option>
+              </el-select>
           </el-form-item>
 
           <el-form-item>
@@ -42,6 +49,18 @@
         <el-table ref="table" v-loading="table.loading" :data="table.pageInfo.list" style="width: 100%" row-key="id" border>
           <el-table-column prop="id" label="ID" width="100" />
 
+          <el-table-column label="键" width="200" align="center">
+            <template slot-scope="scope">
+              <el-tag type="success">{{ scope.row.dataKey }}</el-tag>
+            </template>
+          </el-table-column>
+
+          <el-table-column label="值" width="200" align="center">
+            <template slot-scope="scope">
+              <el-tag type="success">{{ scope.row.dataValue }}</el-tag>
+            </template>
+          </el-table-column>
+
           <el-table-column label="类型名称" width="200" align="center">
             <template slot-scope="scope">
               <el-tag type="info">{{ scope.row.typeName }}</el-tag>
@@ -54,6 +73,8 @@
               <el-tag v-if="!scope.row.isEnable" type="danger">禁用</el-tag>
             </template>
           </el-table-column>
+
+          <el-table-column prop="remark" label="备注" width="200" />
 
           <el-table-column label="操作" fixed="right" min-width="190">
             <template slot-scope="scope">
@@ -71,14 +92,34 @@
     </el-container>
 
     <!--更新对话框-->
-    <el-dialog title="更新" modal :visible.sync="updateDialog.isShow" width="20%">
-      <el-form label-position="right" label-width="120px">
-        <el-form-item label="类型名称">
-          <el-input v-model="updateDialog.formData.typeName" />
-        </el-form-item>
-        <el-form-item label="是否启用">
-          <el-switch v-model="updateDialog.formData.isEnable" />
-        </el-form-item>
+    <el-dialog title="更新" modal :visible.sync="updateDialog.isShow" width="30%">
+      <el-form label-position="right" label-width="80px">
+        <el-form-item label="键">
+            <el-input v-model="updateDialog.formData.dataKey" />
+          </el-form-item>
+
+          <el-form-item label="值">
+            <el-input v-model="updateDialog.formData.dataValue" />
+          </el-form-item>
+
+          <el-form-item label="类型">
+            <el-select v-model="updateDialog.formData.typeId" placeholder="请选择">
+                <el-option
+                  v-for="item in dictTypeList"
+                  :key="item.typeId"
+                  :label="item.typeName"
+                  :value="item.typeId">
+                </el-option>
+              </el-select>
+          </el-form-item>
+
+          <el-form-item label="是否启用">
+            <el-switch v-model="updateDialog.formData.isEnable" />
+          </el-form-item>
+
+          <el-form-item label="备注">
+            <el-input v-model="updateDialog.formData.remark" />
+          </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="updateDialog.isShow = false">取 消</el-button>
@@ -87,13 +128,33 @@
     </el-dialog>
 
     <!--添加对话框-->
-    <el-dialog title="添加" modal :visible.sync="addDialog.isShow" width="20%">
-      <el-form label-position="right" label-width="120px">
-        <el-form-item label="类型名称">
-          <el-input v-model="addDialog.formData.typeName" />
+    <el-dialog title="添加" modal :visible.sync="addDialog.isShow" width="30%">
+      <el-form label-position="right" label-width="80px">
+        <el-form-item label="键">
+          <el-input v-model="addDialog.formData.dataKey" />
         </el-form-item>
+
+        <el-form-item label="值">
+          <el-input v-model="addDialog.formData.dataValue" />
+        </el-form-item>
+
+        <el-form-item label="类型">
+          <el-select v-model="addDialog.formData.typeId" placeholder="请选择">
+              <el-option
+                v-for="item in dictTypeList"
+                :key="item.typeId"
+                :label="item.typeName"
+                :value="item.typeId">
+              </el-option>
+            </el-select>
+        </el-form-item>
+
         <el-form-item label="是否启用">
           <el-switch v-model="addDialog.formData.isEnable" />
+        </el-form-item>
+
+        <el-form-item label="备注">
+          <el-input v-model="addDialog.formData.remark" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -106,11 +167,15 @@
 
 <script>
 import {
-  getGlobalParamsTypePageInfo,
-  updateGlobalParamsType,
-  addGlobalParamsType,
-  deleteGlobalParamsType
-} from '@/api/params/paramsType'
+  getDictPageInfo,
+  updateDict,
+  addDict,
+  deleteDict
+} from '@/api/dict/dict'
+
+import {
+  listDictType
+} from '@/api/dict/dictType'
 
 import pagination from '@/components/Pagination'
 import permission from '@/directive/permission/index.js'
@@ -123,6 +188,7 @@ export default {
   },
   data() {
     return {
+      dictTypeList: [],
       table: {
         loading: false,
 
@@ -134,8 +200,8 @@ export default {
           pageNumber: 1,
           pageSize: 10,
           data: {
-            typeName: null,
-            isEnable: true
+            typeId: null,
+            isEnable: null
           }
         }
       },
@@ -145,7 +211,10 @@ export default {
         isShow: false,
         formData: {
           id: null,
-          typeName: null,
+          dataKey: null,
+          dataValue: null,
+          remark: null,
+          typeId: null,
           isEnable: null
         }
       },
@@ -154,14 +223,26 @@ export default {
       addDialog: {
         isShow: false,
         formData: {
-          typeName: null,
+          dataKey: null,
+          dataValue: null,
+          remark: null,
+          typeId: null,
           isEnable: null
         }
       }
     }
   },
+  created() {
+    this.loadDictTypeList()
+  },
 
   methods: {
+
+    loadDictTypeList: function() {
+      listDictType().then(resp => {
+        this.dictTypeList = resp.data
+      })
+    },
 
     handleQuery: function() {
       this.handlePageQuery(this.table.pageQuery)
@@ -170,7 +251,7 @@ export default {
     handlePageQuery: function(pagerRequest) {
       this.table.loading = true
       pagerRequest.data = this.table.pageQuery.data
-      getGlobalParamsTypePageInfo(pagerRequest).then(resp => {
+      getDictPageInfo(pagerRequest).then(resp => {
         this.table.pageInfo = resp.data
         this.table.loading = false
       })
@@ -182,7 +263,7 @@ export default {
     },
 
     doUpdate: function() {
-      updateGlobalParamsType(this.updateDialog.formData).then(resp => {
+      updateDict(this.updateDialog.formData).then(resp => {
         if (resp.status === 0) {
           this.$message({
             message: '更新成功',
@@ -200,7 +281,7 @@ export default {
     },
 
     doAdd: function() {
-      addGlobalParamsType(this.addDialog.formData).then(resp => {
+      addDict(this.addDialog.formData).then(resp => {
         if (resp.status === 0) {
           this.$message({
             message: '添加成功',
@@ -219,11 +300,11 @@ export default {
     },
 
     doDelete: function(data) {
-      this.$confirm('你确定要删除 ' + data.typeName + ' 全局参数类型吗？', '警告', {
+      this.$confirm('你确定要删除 ' + data.dataKey + ' 字典吗？', '警告', {
         confirmButtonText: '删除',
         cancelButtonText: '取消'
       }).then(() => {
-        deleteGlobalParamsType(data.id).then(resp => {
+        deleteDict(data.id).then(resp => {
           if (resp.status === 0) {
             this.$message({
               message: '删除成功',
