@@ -45,3 +45,10 @@ export function deleteJob(jobId) {
     method: 'delete'
   })
 }
+
+export function getJobClassList() {
+  return request({
+    url: '/api/admin/schedule/jobList',
+    method: 'get'
+  })
+}

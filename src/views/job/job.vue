@@ -78,8 +78,16 @@
     <!--添加对话框-->
     <el-dialog title="添加" modal :visible.sync="addDialog.isShow" width="30%">
       <el-form label-position="right" label-width="100px">
+         
         <el-form-item label="Job类">
-          <el-input v-model="addDialog.formData.jobRefClass" />
+          <el-select v-model="addDialog.formData.jobRefClass" placeholder="请选择">
+             <el-option
+               v-for="item in jobClassList"
+               :key="item"
+               :label="item"
+               :value="item">
+             </el-option>
+           </el-select>
         </el-form-item>
 
         <el-form-item label="cron表达式">
@@ -105,7 +113,8 @@ import {
   updateJob,
   pauseJob,
   resumeJob,
-  deleteJob
+  deleteJob,
+  getJobClassList
 } from '@/api/job/job'
 
 import pagination from '@/components/Pagination'
@@ -119,7 +128,7 @@ export default {
   },
   data() {
     return {
-      dictTypeList: [],
+      jobClassList: [],
       table: {
         loading: false,
 
@@ -154,6 +163,12 @@ export default {
         }
       }
     }
+  },
+
+  created() {
+    getJobClassList().then(resp => {
+      this.jobClassList = resp.data
+    })
   },
 
   methods: {
