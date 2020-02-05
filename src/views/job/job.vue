@@ -4,26 +4,6 @@
       <!-- 顶部栏 用于放置其它控件-->
       <el-header ref="header" style="height: auto;">
         <el-form :inline="true">
-          <el-form-item label="状态">
-            <el-select v-model="table.pageQuery.data.isEnable" placeholder="可选">
-              <el-option label="启用" value="true" />
-              <el-option label="禁用" value="false" />
-            </el-select>
-          </el-form-item>
-
-          <el-form-item label="类型名称">
-            <el-input v-model="table.pageQuery.data.typeName" placeholder="可选" />
-          </el-form-item>
-
-          <el-form-item>
-            <el-button
-              v-permission="['role:add']"
-              icon="el-icon-search"
-              style="float: right;"
-              @click="handleQuery"
-            >查询</el-button>
-          </el-form-item>
-
           <el-button
             v-permission="['role:add']"
             icon="el-icon-plus"
@@ -32,9 +12,7 @@
             size="small"
             @click="addDialog.isShow = true"
           >添加</el-button>
-
         </el-form>
-
       </el-header>
 
       <!-- 数据表格 -->
@@ -42,9 +20,15 @@
         <el-table ref="table" v-loading="table.loading" :data="table.pageInfo.list" style="width: 100%" row-key="id" border>
           <el-table-column prop="id" label="ID" width="100" />
 
-          <el-table-column label="类型名称" width="200" align="center">
+          <el-table-column label="Job类" width="400" align="center">
             <template slot-scope="scope">
-              <el-tag type="info">{{ scope.row.typeName }}</el-tag>
+              <el-tag type="info">{{ scope.row.jobRefClass }}</el-tag>
+            </template>
+          </el-table-column>
+
+          <el-table-column label="cron表达式" width="200" align="center">
+            <template slot-scope="scope">
+              <el-tag type="success">{{ scope.row.cronExpression }}</el-tag>
             </template>
           </el-table-column>
 
@@ -55,9 +39,13 @@
             </template>
           </el-table-column>
 
+          <el-table-column prop="jobRemark" label="备注" width="200" />
+
           <el-table-column label="操作" fixed="right" min-width="190">
             <template slot-scope="scope">
-              <el-button icon="el-icon-edit" size="mini" type="primary" @click="handleUpdate(scope.row)">更新</el-button>
+              <el-button :disabled="!scope.row.isEnable" icon="el-icon-edit" size="mini" type="warning" @click="doPause(scope.row)">暂停</el-button>
+              <el-button :disabled="scope.row.isEnable" icon="el-icon-edit" size="mini" type="primary" @click="doResume(scope.row)">恢复</el-button>
+              <el-button icon="el-icon-delete" size="mini" type="info" @click="handleUpdate(scope.row)">更新</el-button>
               <el-button icon="el-icon-delete" size="mini" type="danger" @click="doDelete(scope.row)">删除</el-button>
             </template>
           </el-table-column>
@@ -71,13 +59,14 @@
     </el-container>
 
     <!--更新对话框-->
-    <el-dialog title="更新" modal :visible.sync="updateDialog.isShow" width="20%">
-      <el-form label-position="right" label-width="120px">
-        <el-form-item label="类型名称">
-          <el-input v-model="updateDialog.formData.typeName" />
+    <el-dialog title="更新" modal :visible.sync="updateDialog.isShow" width="30%">
+      <el-form label-position="right" label-width="100px">
+        <el-form-item label="cron表达式">
+          <el-input v-model="updateDialog.formData.cronExpression" />
         </el-form-item>
-        <el-form-item label="是否启用">
-          <el-switch v-model="updateDialog.formData.isEnable" />
+
+        <el-form-item label="备注">
+          <el-input v-model="updateDialog.formData.jobRemark" type="textarea" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -87,13 +76,18 @@
     </el-dialog>
 
     <!--添加对话框-->
-    <el-dialog title="添加" modal :visible.sync="addDialog.isShow" width="20%">
-      <el-form label-position="right" label-width="120px">
-        <el-form-item label="类型名称">
-          <el-input v-model="addDialog.formData.typeName" />
+    <el-dialog title="添加" modal :visible.sync="addDialog.isShow" width="30%">
+      <el-form label-position="right" label-width="100px">
+        <el-form-item label="Job类">
+          <el-input v-model="addDialog.formData.jobRefClass" />
         </el-form-item>
-        <el-form-item label="是否启用">
-          <el-switch v-model="addDialog.formData.isEnable" />
+
+        <el-form-item label="cron表达式">
+          <el-input v-model="addDialog.formData.cronExpression" />
+        </el-form-item>
+
+        <el-form-item label="备注">
+          <el-input v-model="addDialog.formData.jobRemark" type="textarea" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -106,11 +100,13 @@
 
 <script>
 import {
-  getGlobalParamsTypePageInfo,
-  updateGlobalParamsType,
-  addGlobalParamsType,
-  deleteGlobalParamsType
-} from '@/api/params/paramsType'
+  getJobPageInfo,
+  addJob,
+  updateJob,
+  pauseJob,
+  resumeJob,
+  deleteJob
+} from '@/api/job/job'
 
 import pagination from '@/components/Pagination'
 import permission from '@/directive/permission/index.js'
@@ -123,6 +119,7 @@ export default {
   },
   data() {
     return {
+      dictTypeList: [],
       table: {
         loading: false,
 
@@ -133,10 +130,7 @@ export default {
         pageQuery: {
           pageNumber: 1,
           pageSize: 10,
-          data: {
-            typeName: null,
-            isEnable: true
-          }
+          data: null
         }
       },
 
@@ -145,8 +139,8 @@ export default {
         isShow: false,
         formData: {
           id: null,
-          typeName: null,
-          isEnable: null
+          jobRemark: null,
+          cronExpression: null
         }
       },
 
@@ -154,8 +148,9 @@ export default {
       addDialog: {
         isShow: false,
         formData: {
-          typeName: null,
-          isEnable: null
+          jobRemark: null,
+          cronExpression: null,
+          jobRefClass: null
         }
       }
     }
@@ -170,7 +165,7 @@ export default {
     handlePageQuery: function(pagerRequest) {
       this.table.loading = true
       pagerRequest.data = this.table.pageQuery.data
-      getGlobalParamsTypePageInfo(pagerRequest).then(resp => {
+      getJobPageInfo(pagerRequest).then(resp => {
         this.table.pageInfo = resp.data
         this.table.loading = false
       })
@@ -182,7 +177,7 @@ export default {
     },
 
     doUpdate: function() {
-      updateGlobalParamsType(this.updateDialog.formData).then(resp => {
+      updateJob(this.updateDialog.formData).then(resp => {
         if (resp.status === 0) {
           this.$message({
             message: '更新成功',
@@ -200,7 +195,7 @@ export default {
     },
 
     doAdd: function() {
-      addGlobalParamsType(this.addDialog.formData).then(resp => {
+      addJob(this.addDialog.formData).then(resp => {
         if (resp.status === 0) {
           this.$message({
             message: '添加成功',
@@ -219,11 +214,11 @@ export default {
     },
 
     doDelete: function(data) {
-      this.$confirm('你确定要删除 ' + data.typeName + ' 全局参数类型吗？', '警告', {
+      this.$confirm('你确定要删除 ' + data.jobRefClass + ' 任务吗？', '警告', {
         confirmButtonText: '删除',
         cancelButtonText: '取消'
       }).then(() => {
-        deleteGlobalParamsType(data.id).then(resp => {
+        deleteJob(data.id).then(resp => {
           if (resp.status === 0) {
             this.$message({
               message: '删除成功',
@@ -233,6 +228,54 @@ export default {
           } else {
             this.$message({
               message: '删除失败',
+              type: 'error'
+            })
+          }
+        })
+      }).catch(() => {
+        // not do anything
+      })
+    },
+
+    doPause: function(data) {
+      this.$confirm('你确定要暂停 ' + data.jobRefClass + ' 任务吗？', '警告', {
+        confirmButtonText: '暂停',
+        cancelButtonText: '取消'
+      }).then(() => {
+        pauseJob(data.id).then(resp => {
+          if (resp.status === 0) {
+            this.$message({
+              message: '暂停成功',
+              type: 'success'
+            })
+            this.handleQuery()
+          } else {
+            this.$message({
+              message: '暂停失败',
+              type: 'error'
+            })
+          }
+        })
+      }).catch(() => {
+        // not do anything
+      })
+    },
+
+    doResume: function(data) {
+      this.$confirm('你确定要恢复 ' + data.jobRefClass + ' 任务吗？', '警告', {
+        confirmButtonText: '恢复',
+        cancelButtonText: '取消'
+      }).then(() => {
+        resumeJob(data.id).then(resp => {
+          if (resp.status === 0) {
+            this.$message({
+              message: '恢复成功',
+              type: 'success'
+            })
+            this.handleQuery()
+          } else {
+            this.$message({
+              message: '恢复失败',
               type: 'error'
             })
           }
