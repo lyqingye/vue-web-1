@@ -24,7 +24,8 @@ export const componentMap = new Map([
   ['logs-sms-log', () => import('@/views/logs/smsLog')],
   ['global-dict-type', () => import('@/views/config/dictType')],
   ['global-dict', () => import('@/views/config/dict')],
-  ['job', () => import('@/views/job/job')]
+  ['job', () => import('@/views/job/job')],
+  ['db-backup', () => import('@/views/dbbackup/dbbackup')]
 ])
 
 /**

@@ -45,7 +45,7 @@
             <template slot-scope="scope">
               <el-button :disabled="!scope.row.isEnable" icon="el-icon-edit" size="mini" type="warning" @click="doPause(scope.row)">暂停</el-button>
               <el-button :disabled="scope.row.isEnable" icon="el-icon-edit" size="mini" type="primary" @click="doResume(scope.row)">恢复</el-button>
-              <el-button icon="el-icon-delete" size="mini" type="info" @click="handleUpdate(scope.row)">更新</el-button>
+              <el-button icon="el-icon-edit" size="mini" type="info" @click="handleUpdate(scope.row)">更新</el-button>
               <el-button icon="el-icon-delete" size="mini" type="danger" @click="doDelete(scope.row)">删除</el-button>
             </template>
           </el-table-column>
