@@ -45,6 +45,23 @@
         </el-form-item>
       </el-tooltip>
 
+      <el-form-item prop="verifyCode">
+        <span class="svg-container">
+          <svg-icon icon-class="lock" />
+        </span>
+        <el-input
+          ref="verifyCode"
+          v-model="loginForm.verifyCode"
+          placeholder="verifyCode"
+          name="verifyCode"
+          type="text"
+          tabindex="3"
+          autocomplete="on"
+          style="width: 50%;"
+        />
+        <img :src="'/api/admin/verifyCode/' + loginForm.randomCode" style="float: right;" @click="refreshVerifyCode">
+      </el-form-item>
+
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
 
       <div style="position:relative">
@@ -97,8 +114,10 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: 'super_admin',
+        password: '123456',
+        verifyCode: '',
+        randomCode: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -125,6 +144,7 @@ export default {
     }
   },
   created() {
+    this.refreshVerifyCode()
     // window.addEventListener('storage', this.afterQRScan)
   },
   mounted() {
@@ -135,6 +155,7 @@ export default {
     }
   },
   destroyed() {
+
     // window.removeEventListener('storage', this.afterQRScan)
   },
   methods: {
@@ -170,6 +191,7 @@ export default {
               this.loading = false
             })
             .catch(() => {
+              this.refreshVerifyCode()
               this.loading = false
             })
         } else {
@@ -185,6 +207,10 @@ export default {
         }
         return acc
       }, {})
+    },
+
+    refreshVerifyCode() {
+      this.loginForm.randomCode = Math.floor(Math.random() * 1000000000000 + 1000000000000)
     }
     // afterQRScan() {
     //   if (e.key === 'x-admin-oauth-code') {
