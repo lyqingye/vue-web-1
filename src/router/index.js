@@ -26,7 +26,8 @@ export const componentMap = new Map([
   ['global-dict', () => import('@/views/config/dict')],
   ['job', () => import('@/views/job/job')],
   ['db-backup', () => import('@/views/dbbackup/dbbackup')],
-  ['member', () => import('@/views/admin/member')]
+  ['member', () => import('@/views/admin/member')],
+  ['veto', () => import('@/views/admin/veto')]
 ])
 
 /**
