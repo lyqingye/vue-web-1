@@ -43,7 +43,7 @@
 
           <el-table-column label="所属用户" width="150" align="center">
             <template slot-scope="scope">
-              <el-tag type="info">{{scope.row.refMember}}</el-tag>
+              <el-tag type="info">{{ scope.row.refMember }}</el-tag>
             </template>
           </el-table-column>
 
