@@ -8,4 +8,18 @@ export function getMemberPageInfo(pagerRequest) {
   })
 }
 
+export function deleteMember(memberId) {
+  return request({
+    url: '/api/admin/member/delete/' + memberId,
+    method: 'delete'
+  })
+}
+
+export function forceResetMemberLoginPassword(data) {
+  return request({
+    url: '/api/admin/member/forceResetLoginPassword' ,
+    method: 'post',
+    data
+  })
+}
 
