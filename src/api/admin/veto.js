@@ -7,3 +7,10 @@ export function getVetoFormPageInfo(pagerRequest) {
     data: pagerRequest
   })
 }
+
+export function deleteVeto(vetoId) {
+  return request({
+    url: '/api/admin/veto/delete/' + vetoId,
+    method: 'delete'
+  })
+}

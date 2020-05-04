@@ -5,14 +5,7 @@
       <el-header ref="header" style="height: auto;">
         <el-form :inline="true">
           <el-form-item label="手机号">
-            <el-input v-model="table.pageQuery.data.mobile" placeholder="可选" />
-          </el-form-item>
-
-          <el-form-item label="是否冻结">
-            <el-select v-model="table.pageQuery.data.isFrozen" placeholder="可选">
-              <el-option label="正常" value="false" />
-              <el-option label="冻结" value="true" />
-            </el-select>
+            <el-input v-model="table.pageQuery.data.refMember" placeholder="可选" />
           </el-form-item>
 
           <el-form-item>
@@ -47,7 +40,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="创建时间" width="250" align="center">
+          <el-table-column label="创建时间" width="260" align="center">
             <template slot-scope="scope">
               <el-tag>
                 <i class="el-icon-time" />
@@ -56,8 +49,10 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="操作" fixed="right" min-width="190">
-            <template slot-scope="scope" />
+          <el-table-column label="操作">
+            <template slot-scope="scope">
+              <el-button icon="el-icon-delete" size="mini" type="danger" @click="handleDeleteVeto(scope.row)">删除</el-button>
+            </template>
           </el-table-column>
         </el-table>
       </el-main>
@@ -74,7 +69,8 @@
 <script>
 
 import {
-  getVetoFormPageInfo
+  getVetoFormPageInfo,
+  deleteVeto
 } from '@/api/admin/veto'
 
 import pagination from '@/components/Pagination'
@@ -99,7 +95,6 @@ export default {
           pageNumber: 1,
           pageSize: 10,
           data: {
-            dateRange: [],
             refMember: null
           }
         }
@@ -118,6 +113,29 @@ export default {
       getVetoFormPageInfo(pagerRequest).then(resp => {
         this.table.pageInfo = resp.data
         this.table.loading = false
+      })
+    },
+    handleDeleteVeto: function(data) {
+      this.$confirm('你确定要删除 ' + data.title + ' 问卷吗？', '警告', {
+        confirmButtonText: '删除',
+        cancelButtonText: '取消'
+      }).then(() => {
+        deleteVeto(data.vetoId).then(resp => {
+          if (resp.status === 0) {
+            this.$message({
+              message: '删除成功',
+              type: 'success'
+            })
+            this.handleQuery()
+          } else {
+            this.$message({
+              message: '删除失败',
+              type: 'error'
+            })
+          }
+        })
+      }).catch(() => {
+        // not do anything
       })
     }
   }

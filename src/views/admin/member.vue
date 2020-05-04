@@ -60,9 +60,9 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="操作" fixed="right" min-width="190">
+          <!-- <el-table-column label="操作" >
             <template slot-scope="scope" />
-          </el-table-column>
+          </el-table-column> -->
         </el-table>
       </el-main>
 
