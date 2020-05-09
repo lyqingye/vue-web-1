@@ -1,9 +1,8 @@
 import request from '@/utils/request'
 
-
-//----------------------------------------------------------
+// ----------------------------------------------------------
 // permission
-//----------------------------------------------------------
+// ----------------------------------------------------------
 
 export function getPermissionList() {
   return request({
@@ -42,9 +41,9 @@ export function deletePermission(id) {
   })
 }
 
-//----------------------------------------------------------
+// ----------------------------------------------------------
 // router
-//----------------------------------------------------------
+// ----------------------------------------------------------
 
 export function getRouterList() {
   return request({
@@ -83,9 +82,9 @@ export function deleteMenuRouter(routerId) {
   })
 }
 
-//----------------------------------------------------------
+// ----------------------------------------------------------
 // role
-//----------------------------------------------------------
+// ----------------------------------------------------------
 
 export function getRolePageInfo(pagerRequest) {
   return request({
@@ -125,9 +124,9 @@ export function getRoleList() {
   })
 }
 
-//----------------------------------------------------------
+// ----------------------------------------------------------
 // user
-//----------------------------------------------------------
+// ----------------------------------------------------------
 
 export function getUserPageInfo(pagerRequest) {
   return request({
@@ -148,6 +147,14 @@ export function addUser(data) {
 export function updateUser(data) {
   return request({
     url: '/api/admin/security/updateUser',
+    method: 'put',
+    data
+  })
+}
+
+export function changeUserPassword(data) {
+  return request({
+    url: '/api/admin/security/changePassword',
     method: 'put',
     data
   })

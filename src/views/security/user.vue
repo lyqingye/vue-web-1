@@ -3,7 +3,7 @@
     <el-container>
       <!-- 顶部栏 用于放置其它控件-->
       <el-header ref="header" style="height: 20px;">
-        <el-button type="success" icon="el-icon-plus" size="mini" style="float: right;" @click="addUserDialog.isShow = true" v-permission="['user:add']" >新增</el-button>
+        <el-button v-permission="['user:add']" type="success" icon="el-icon-plus" size="mini" style="float: right;" @click="addUserDialog.isShow = true">新增</el-button>
       </el-header>
 
       <!-- 数据表格 -->
@@ -45,6 +45,7 @@
           <el-table-column label="操作" fixed="right" min-width="190">
             <template slot-scope="scope">
               <el-button icon="el-icon-edit" size="mini" type="primary" @click="handleUpdateUser(scope.$index, scope.row)">编辑</el-button>
+              <el-button icon="el-icon-edit" size="mini" type="primary" @click="handleChangeUserPassword(scope.$index, scope.row)">修改密码</el-button>
               <el-button slot="reference" icon="el-icon-delete" size="mini" type="danger" @click="handleDeleteUser(scope.$index, scope.row)">删除</el-button>
             </template>
           </el-table-column>
@@ -119,13 +120,6 @@
     <el-dialog title="更新用户" modal :visible.sync="updateUserDialog.isShow" width="25%">
       <div v-loading="updateUserDialog.updateLoading">
         <el-form label-position="right" label-width="70px">
-          <el-form-item label="用户名称">
-            <el-input v-model="updateUserDialog.formData.userName" />
-          </el-form-item>
-
-          <el-form-item label="用户密码">
-            <el-input v-model="updateUserDialog.formData.password" type="password" placeholder="可选(如果需要修改密码)" />
-          </el-form-item>
 
           <el-form-item label="手机号">
             <el-input v-model="updateUserDialog.formData.mobile" type="text" maxlength="11" />
@@ -171,6 +165,24 @@
         <el-button type="primary" @click="doUpdateUser">确 定</el-button>
       </div>
     </el-dialog>
+
+    <!--修改用户密码对话框-->
+    <el-dialog title="更新用户" modal :visible.sync="changeUserPasswordDialog.isShow" width="25%">
+      <div v-loading="changeUserPasswordDialog.changePasswordLoading">
+        <el-form label-position="right" label-width="70px">
+
+          <el-form-item label="新密码">
+            <el-input v-model="changeUserPasswordDialog.formData.newPassword" type="password" />
+          </el-form-item>
+        </el-form>
+
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="changeUserPasswordDialog.isShow = false">取 消</el-button>
+        <el-button type="primary" @click="doHandleChangeUserPassword">确 定</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -180,7 +192,8 @@ import {
   addUser,
   updateUser,
   deleteUser,
-  getRoleList
+  getRoleList,
+  changeUserPassword
 } from '@/api/security'
 import permission from '@/directive/permission/index.js'
 export default {
@@ -228,6 +241,15 @@ export default {
           introduction: null,
           isFrozen: false,
           roleCheckStatusList: []
+        }
+      },
+
+      changeUserPasswordDialog: {
+        changePasswordLoading: false,
+        isShow: false,
+        formData: {
+          userId: null,
+          newPassword: null
         }
       }
     }
@@ -338,6 +360,31 @@ export default {
         }
         this.updateUserDialog.updateLoading = false
         this.updateUserDialog.isShow = false
+      })
+    },
+
+    handleChangeUserPassword: function(index, data) {
+      this.changeUserPasswordDialog.formData.userId = data.id
+      this.changeUserPasswordDialog.isShow = true
+    },
+
+    doHandleChangeUserPassword: function() {
+      this.changeUserPasswordDialog.changePasswordLoading = true
+      changeUserPassword(this.changeUserPasswordDialog.formData).then(resp => {
+        if (resp.status === 0) {
+          this.$message({
+            message: '修改成功',
+            type: 'success'
+          })
+          this.loadUserPageInfo()
+        } else {
+          this.$message({
+            message: '修改失败',
+            type: 'error'
+          })
+        }
+        this.changeUserPasswordDialog.changePasswordLoading = false
+        this.changeUserPasswordDialog.isShow = false
       })
     },
 
