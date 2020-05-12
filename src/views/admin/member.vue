@@ -60,9 +60,12 @@
             </template>
           </el-table-column>
 
-          <!-- <el-table-column label="操作" >
-            <template slot-scope="scope" />
-          </el-table-column> -->
+          <el-table-column label="操作">
+            <template slot-scope="scope">
+              <el-button icon="el-icon-edit" size="mini" type="primary" @click="handleChangeUserPassword(scope.$index, scope.row)">修改密码</el-button>
+              <el-button slot="reference" icon="el-icon-delete" size="mini" type="danger" @click="handleDeleteMember(scope.$index, scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
         </el-table>
       </el-main>
 
@@ -71,14 +74,31 @@
         <pagination :total="table.pageInfo.total" :page.sync="table.pageInfo.pageNum" :limit.sync="table.pageInfo.pageSize" @pagination="handlePageQuery" />
       </el-footer>
     </el-container>
+    <!--修改用户密码对话框-->
+    <el-dialog title="更新用户" modal :visible.sync="changeUserPasswordDialog.isShow" width="25%">
+      <div>
+        <el-form label-position="right" label-width="70px">
 
+          <el-form-item label="新密码">
+            <el-input v-model="changeUserPasswordDialog.formData.newPassword" type="password" />
+          </el-form-item>
+        </el-form>
+
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="changeUserPasswordDialog.isShow = false">取 消</el-button>
+        <el-button type="primary" @click="doHandleChangeUserPassword">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 
 import {
-  getMemberPageInfo
+  getMemberPageInfo,
+  deleteMember,
+  forceResetMemberLoginPassword
 } from '@/api/admin/member'
 
 import pagination from '@/components/Pagination'
@@ -107,6 +127,14 @@ export default {
             isFrozen: null
           }
         }
+      },
+
+      changeUserPasswordDialog: {
+        isShow: false,
+        formData: {
+          userId: null,
+          newPassword: null
+        }
       }
     }
   },
@@ -122,6 +150,53 @@ export default {
       getMemberPageInfo(pagerRequest).then(resp => {
         this.table.pageInfo = resp.data
         this.table.loading = false
+      })
+    },
+
+    handleDeleteMember: function(index, data) {
+      this.$confirm('你确定要删除 ' + data.mobile + ' 用户吗？', '警告', {
+        confirmButtonText: '删除',
+        cancelButtonText: '取消'
+      }).then(() => {
+        deleteMember(data.id).then(resp => {
+          if (resp.status === 0) {
+            this.$message({
+              message: '删除成功',
+              type: 'success'
+            })
+            this.handleQuery()
+          } else {
+            this.$message({
+              message: '删除失败',
+              type: 'error'
+            })
+          }
+        })
+      }).catch(() => {
+        // not do anything
+      })
+    },
+
+    handleChangeUserPassword: function(index, data) {
+      this.changeUserPasswordDialog.formData.userId = data.id
+      this.changeUserPasswordDialog.isShow = true
+    },
+
+    doHandleChangeUserPassword: function() {
+      forceResetMemberLoginPassword(this.changeUserPasswordDialog.formData).then(resp => {
+        if (resp.status === 0) {
+          this.$message({
+            message: '修改成功',
+            type: 'success'
+          })
+          this.handleQuery()
+          this.changeUserPasswordDialog.isShow = false
+        } else {
+          this.$message({
+            message: '修改失败',
+            type: 'error'
+          })
+        }
       })
     }
   }

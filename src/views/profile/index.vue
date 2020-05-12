@@ -7,22 +7,19 @@
           <user-card :user="user" />
         </el-col>
 
-        <el-col :span="18" :xs="24">
+        <el-col :span="10" :xs="24">
           <el-card>
             <el-tabs v-model="activeTab">
-              <el-tab-pane label="Activity" name="activity">
-                <activity />
-              </el-tab-pane>
-              <el-tab-pane label="Timeline" name="timeline">
-                <timeline />
-              </el-tab-pane>
-              <el-tab-pane label="Account" name="account">
+              <el-tab-pane label="头像修改" name="account">
                 <account :user="user" />
               </el-tab-pane>
+              <el-tab-pane label="密码修改" name="activity">
+                <activity />
+              </el-tab-pane>
+
             </el-tabs>
           </el-card>
         </el-col>
-
       </el-row>
     </div>
   </div>
@@ -48,7 +45,8 @@ export default {
     ...mapGetters([
       'name',
       'avatar',
-      'roles'
+      'roles',
+      'introduction'
     ])
   },
   created() {
@@ -60,7 +58,8 @@ export default {
         name: this.name,
         role: this.roles.join(' | '),
         email: 'admin@test.com',
-        avatar: this.avatar
+        avatar: this.avatar,
+        introduction: this.introduction
       }
     }
   }

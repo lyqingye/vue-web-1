@@ -173,3 +173,19 @@ export function getUserInfo() {
     method: 'get'
   })
 }
+
+export function updateUserAvatarData(data) {
+  return request({
+    url: '/api/admin/security/updateUserAvatarData',
+    method: 'put',
+    data
+  })
+}
+
+export function updateUserPassword(data) {
+  return request({
+    url: '/api/admin/security/updateUserPassword',
+    method: 'put',
+    data
+  })
+}
