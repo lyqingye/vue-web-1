@@ -6,8 +6,7 @@
 
     <div class="user-profile">
       <div class="box-center">
-        <pan-thumb :image="user.avatar" :height="'100px'" :width="'100px'" :hoverable="false">
-        </pan-thumb>
+        <pan-thumb :image="user.avatar" :height="'100px'" :width="'100px'" :hoverable="false" />
       </div>
       <div class="box-center">
         <div class="user-name text-center">{{ user.name }}</div>
@@ -25,7 +24,6 @@
           </div>
         </div>
       </div>
-
 
     </div>
   </el-card>

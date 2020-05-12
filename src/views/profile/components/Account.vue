@@ -44,7 +44,7 @@ export default {
     return {
       hideUpload: false,
       limitCount: 1,
-      
+
       updateData: {
         introduction: null,
         avatar: null
@@ -71,7 +71,7 @@ export default {
         }
       })
     },
-    
+
     handleRemove(file, fileList) {
       this.hideUpload = fileList.length >= this.limitCount
     },
